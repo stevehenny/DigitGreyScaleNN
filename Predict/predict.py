@@ -88,10 +88,27 @@ def main():
     print(W1, b1, W2, b2)
 
     # Save the parameters
-    np.save('parameters/W1.npy', W1)
-    np.save('parameters/b1.npy', b1)
-    np.save('parameters/W2.npy', W2)
-    np.save('parameters/b2.npy', b2)
+    script_dir = os.path.dirname(os.path.realpath(__file__))
+
+    # Construct the absolute path to the file
+    file_path = os.path.join(script_dir, 'Parameters', 'W1.npy')
+
+    # Use the absolute path when opening the file
+    with open(file_path, 'rb') as f:
+        np.save(file_path, W1)
+        
+    # Save the parameters for other files
+    file_path = os.path.join(script_dir, 'Parameters', 'b1.npy')
+    with open(file_path, 'rb') as f:
+        np.save(file_path, b1)
+
+    file_path = os.path.join(script_dir, 'Parameters', 'W2.npy')
+    with open(file_path, 'rb') as f:
+        np.save(file_path, W2)
+
+    file_path = os.path.join(script_dir, 'Parameters', 'b2.npy')
+    with open(file_path, 'rb') as f:
+        np.save(file_path, b2)
     
 
 
