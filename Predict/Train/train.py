@@ -1,33 +1,11 @@
 import numpy as np
 import pandas as pd
-import numpy as np
 
-# Read the data from the csv file
 data = pd.read_csv('data/train.csv')
 data = np.array(data)
 
 # Get the shape of the data for later computation
 m, n = data.shape
-
-# Shuffle the data to avoid any bias
-np.random.shuffle(data)
-
-#create training sets
-
-# Dev set is the first 2000 examples
-# This will serve as a validation set
-dev_set = data[0:2000].T
-Y_dev = dev_set[0]
-X_dev = dev_set[1:n]
-X_dev = X_dev / 255
-
-# Training set is the rest of the examples
-test_set = data[2000:m].T
-Y_train_set = test_set[0]
-X_train_set = test_set[1:n]
-X_train_set = X_train_set / 255
-n_train, m_train = X_train_set.shape
-
 
 def initialize_parameters():
     """
@@ -43,15 +21,13 @@ def initialize_parameters():
     b2: numpy.ndarray, shape (n_h, 1)
         Bias vector for the second layer.
     """
-    n_x = 784
-    n_h = 10
-    np.random.seed(1)
-    W1 = np.random.randn(n_h, n_x) - 0.5
-    b1 = np.zeros((n_h, 1)) - 0.5
-    W2 = np.random.randn(n_y, n_h) - 0.5
-    b2 = np.zeros((n_h, 1)) - 0.5
-
+    W1 = np.random.rand(10, 784) - 0.5
+    b1 = np.random.rand(10, 1) - 0.5
+    W2 = np.random.rand(10, 10) - 0.5
+    b2 = np.random.rand(10, 1) - 0.5
     return W1, b1, W2, b2
+
+
 
 def ReLU(z):
     """
@@ -65,7 +41,7 @@ def ReLU(z):
     numpy.ndarray
         Output array after applying ReLU activation.
     """
-    return np.maximum(0, z)
+    return np.maximum(z, 0)
 
 def ReLU_derivative(z):
     """
@@ -93,8 +69,7 @@ def softmax(z):
     numpy.ndarray
         Output array after applying softmax activation.
     """
-    Z = np.max(z, axis=0)
-    A = np.exp(Z) / np.sum(np.exp(Z), axis=0)
+    A = np.exp(z) / sum(np.exp(z))
     return A
 
 def forward_propagation(X, W1, b1, W2, b2):
@@ -199,15 +174,15 @@ def backward_propagation(X, Y, Z1, A1, Z2, A2, W1, W2):
         Gradient of the cost with respect to b2.
     """
     one_hot_Y = one_hot(Y)
-    m = Y.shape[0]
     dZ2 = A2 - one_hot_Y
-    dW2 = 1 / m * np.dot(dZ2, A1.T)
-    db2 = 1 / m * np.sum(dZ2, axis=1, keepdims=True)
-    dZ1 = np.multiply(np.dot(W2.T, dZ2), ReLU_derivative(Z1))
-    dW1 = 1 / m * np.dot(dZ1, X.T)
-    db1 = 1 / m * np.sum(dZ1, axis=1, keepdims=True)
-
+    dW2 = 1 / m * dZ2.dot(A1.T)
+    db2 = 1 / m * np.sum(dZ2)
+    dZ1 = W2.T.dot(dZ2) * ReLU_derivative(Z1)
+    dW1 = 1 / m * dZ1.dot(X.T)
+    db1 = 1 / m * np.sum(dZ1)
     return dW1, db1, dW2, db2
+
+
 
 def update_params(W1, b1, W2, b2, dW1, db1, dW2, db2, learning_rate):
     """
